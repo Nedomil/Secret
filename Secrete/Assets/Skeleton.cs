@@ -7,8 +7,8 @@ public class Skeleton : NPC {
 	// Use this for initialization
 	void Start () {
 		startPosition = transform.position;
-		health = 100;
-		damage = 15;
+		health = 500;
+		damage = 5;
 		exp = 60;
 		attackCooldown = 1.5f;
 		speed = 2.5f;
@@ -19,5 +19,8 @@ public class Skeleton : NPC {
 		livingRadius = 10;
 		lastChaseTime = -(chasingTime + 1);
 		nextWalk = 5;
+		enemies = new ArrayList ();
+		enemies.Add ("Fraction2");
+		enemies.Add("Player");
 	}
 }

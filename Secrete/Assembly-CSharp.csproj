@@ -46,8 +46,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\AggroMeter.cs" />
      <Compile Include="Assets\ClickToMove.cs" />
      <Compile Include="Assets\Combat.cs" />
+     <Compile Include="Assets\Creature.cs" />
      <Compile Include="Assets\Level.cs" />
      <Compile Include="Assets\NPC.cs" />
      <Compile Include="Assets\Skeleton.cs" />

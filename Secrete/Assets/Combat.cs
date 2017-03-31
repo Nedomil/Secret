@@ -2,13 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Combat : MonoBehaviour {
-
-	/* --- AnimationClips --- */
-	public AnimationClip attack;
-	public AnimationClip die;
-	public AnimationClip getHitAnim;
-	public AnimationClip run;
+public class Combat : Creature {
 
 	/* --- Objects --- */
 	private GameObject opponent;
@@ -16,7 +10,7 @@ public class Combat : MonoBehaviour {
 	public GameObject chaseTarget;
 
 	/* --- Stats --- */
-	public int health = 100;
+	public int health = 1000;
 	public int damage = 35;
 	private float opponentTime;
 	private float attackRange = 2f;
@@ -26,11 +20,6 @@ public class Combat : MonoBehaviour {
 	/* --- Bools --- */
 	public bool gettingHit;
 	public bool chasing;
-	public  bool isDead;
-	private bool isCorpse;
-
-
-
 
 
 	// Use this for initialization
@@ -45,7 +34,7 @@ public class Combat : MonoBehaviour {
 			if (!gettingHit) {
 				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 				if (Physics.Raycast (ray, out hit, 1000)) {
-					if (hit.collider.tag == "Enemy" && Input.GetMouseButtonDown (0)) {
+					if ((hit.collider.tag == "Fraction1" || hit.collider.tag == "Fraction2") && Input.GetMouseButtonDown (0)) {
 						if (Vector3.Distance (transform.position, opponent.transform.position) < attackRange) {
 							transform.LookAt (opponent.transform.position);
 							GetComponent<Animation> ().CrossFade (attack.name);
@@ -89,7 +78,7 @@ public class Combat : MonoBehaviour {
 		}
 	}
 
-	public void getHit(int damage) {
+	public override void getHit(int damage, GameObject opponent) {
 		GetComponent<Animation> ().CrossFade (getHitAnim.name);
 		GetComponent<Animation> () [getHitAnim.name].time = 0.42f;
 		gettingHit = true;

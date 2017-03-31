@@ -7,8 +7,8 @@ public class Zombie : NPC {
 	// Use this for initialization
 	void Start () {
 		startPosition = transform.position;
-		health = 150;
-		damage = 30;
+		health = 100;
+		damage = 10;
 		exp = 60;
 		attackCooldown = 2f;
 		speed = 1f;
@@ -19,5 +19,8 @@ public class Zombie : NPC {
 		livingRadius = 10;
 		lastChaseTime = -(chasingTime + 1);
 		nextWalk = 20;
+		enemies = new ArrayList ();
+		enemies.Add("Fraction1");
+		enemies.Add("Player");
 	}	
 }

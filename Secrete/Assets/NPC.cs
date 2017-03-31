@@ -2,15 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NPC : MonoBehaviour {
-
-	/* --- AnimationClips --- */
-	public AnimationClip run;
-	public AnimationClip idle;
-	public AnimationClip die;
-	public AnimationClip attack;
-	public AnimationClip getHitAnim;
-	public AnimationClip waitingForFight;
+public class NPC : Creature {
 
 	/* --- Objects --- */
 	public CharacterController charController;
@@ -36,57 +28,40 @@ public class NPC : MonoBehaviour {
 	private int rotationSpeed = 10;				//Time to rotate
 	public double impactTime;
 	private bool impacted;
+	private AggroMeter aggroMeter = new AggroMeter ();
+
+	/* --- Social --- */
+	protected ArrayList enemies;
 
 
 	/* --- Bools --- */
 	public bool walking;
 	protected bool gettingHit;
-	protected bool isDead;
-	protected bool isCorpse;
 
 
 	// Use this for initialization
 	void Start () {
 	}
 
-	/* ------------------------------ Fight ------------------------------ */
-
-	/*
-	* Handles what happens if NPC get hit.
-	* @damage is incomming
-	* @opponent which is dealing damage
-	*/
-	public void getHit(int damage, GameObject opponent) {
-		GetComponent<Animation> ().CrossFade (getHitAnim.name);
-		GetComponent<Animation> () [getHitAnim.name].time = 0.42f;
-		lastAttack += 0.5f;
-		gettingHit = true;
-		health -= damage;
-		if (health < 0) {
-			health = 0;
-			isDead = true;
-			if (opponent.name == "Player")
-				opponent.GetComponent<Level> ().increaseExp (exp);
-		}
-	}
-
 	// Update is called once per frame
 	void Update () {
+		checkRadiusForOpponents ();
 		if (!isDead) {
+			handleAggro ();
 			if (!gettingHit) {
-				if (playerInAttackRange () && !player.GetComponent<Combat> ().isDead) {
+				if (opponentInAttackRange () && !opponent.GetComponent<Creature> ().isDead) {
 					//so the NPC don't attack imediatly after the fight ist starting
 					if (Time.time - lastAttack > 3) {
 						lastAttack = Time.time;
 						GetComponent<Animation> ().CrossFade (waitingForFight.name);
 					}
-					transform.LookAt (player.position);
+					transform.LookAt (opponent.transform.position);
 					//Only attacks if cooldow is over
 					if (Time.time > attackCooldown + lastAttack) {
 						GetComponent<Animation> ().CrossFade (attack.name);
 						lastAttack = Time.time;
 					}
-				} else if ((playerInRange () || npcInChasingTime ()) && !player.GetComponent<Combat> ().isDead)					
+				} else if ((hasOpponent () && npcInChasingTime ()) && !opponent.GetComponent<Creature> ().isDead)					
 					chase ();
 				else
 					live ();
@@ -102,22 +77,70 @@ public class NPC : MonoBehaviour {
 		}
 	}
 
-	void OnMouseOver() {
-		player.GetComponent<Combat> ().setOpponent(gameObject);
+	/* ------------------------------ Fight ------------------------------ */
+
+	/*
+	* Handles what happens if NPC get hit.
+	* @damage is incomming
+	* @opponent which is dealing damage
+	*/
+		public override void getHit(int damage, GameObject opponent) {
+		if (this.name == "SkeletonBoss") {
+			Debug.Log (aggroMeter.getOpponentAndAggro (0));
+			Debug.Log (aggroMeter.getOpponentAndAggro (1));
+			Debug.Log (aggroMeter.getOpponentAndAggro (2));
+		}
+		handleAggro (opponent, damage);
+		GetComponent<Animation> ().CrossFade (getHitAnim.name);
+		GetComponent<Animation> () [getHitAnim.name].time = 0.42f;
+		lastAttack += 0.5f;
+		gettingHit = true;
+		health -= damage;
+		if (health < 0) {
+			health = 0;
+			isDead = true;
+			if (opponent.name == "Player")
+				opponent.GetComponent<Level> ().increaseExp (exp);
+		}
+	}
+
+
+	/*
+	 * Handles @aggroMeter. Adds new oppoennt and changes opponent if a new one
+	 * has the most aggro.
+	 * @opponent which has to bi add
+	 * @dmg of the opponent
+	 */
+	private void handleAggro(GameObject opponent, int dmg) {
+		aggroMeter.addAggro (opponent, dmg);
+		handleAggro ();
 	}
 
 	/*
-	 * Checks if the player is in Range
-	*/
-	protected bool playerInRange() {
-		return Vector3.Distance (transform.position, player.position) < aggroRange;
+	 * Helps handleAggro(GameObject, int) to find the new opponent with the
+	 * highest aggro.
+	 */
+	private void handleAggro() {
+		GameObject highestAggroOpponent = aggroMeter.getHighestAggro ();
+
+		while (highestAggroOpponent != null && highestAggroOpponent.GetComponent<Creature> ().isDead) {
+			aggroMeter.deleteAggro (highestAggroOpponent);
+			highestAggroOpponent = aggroMeter.getHighestAggro ();
+		}
+
+		if (highestAggroOpponent != null)
+			this.opponent = highestAggroOpponent;
+	}
+
+	void OnMouseOver() {
+		player.GetComponent<Combat> ().setOpponent(gameObject);
 	}
 
 	/*
 	 * Checks if the NPC is chasing something.
 	*/
 	protected bool npcInChasingTime () {
-		return chasingTime > Time.time - lastChaseTime;
+		return Time.time < chasingTime + lastChaseTime;
 	}
 
 	/*
@@ -125,10 +148,10 @@ public class NPC : MonoBehaviour {
 	*/
 	protected void chase() {
 		// if player isn't in range, the chasingTime will stop updating
-		if (playerInRange ())
+		if (hasOpponent ())
 			lastChaseTime = Time.time;
-		transform.LookAt (player.position);
-		if (Vector3.Distance (transform.position, player.transform.position) > 2) {
+		transform.LookAt (opponent.transform.position);
+		if (Vector3.Distance (transform.position, opponent.transform.position) > 2) {
 			charController.SimpleMove (transform.forward * speed);
 			GetComponent<Animation> ().CrossFade (run.name);
 		} else {
@@ -136,8 +159,10 @@ public class NPC : MonoBehaviour {
 		}
 	}
 
-	protected bool playerInAttackRange() {
-		return Vector3.Distance (transform.position, player.position) < attackRange;
+	protected bool opponentInAttackRange() {
+		if (opponent == null)
+			return false;
+		return Vector3.Distance (transform.position, opponent.transform.position) < attackRange;
 	}
 
 	protected void resetGettingHit() {
@@ -150,9 +175,9 @@ public class NPC : MonoBehaviour {
 			if (GetComponent<Animation> () [attack.name].time < GetComponent<Animation> () [attack.name].length * 0.1) {
 				impacted = false;
 			}
-			if (playerInAttackRange () && !impacted && GetComponent<Animation> ().IsPlaying (attack.name)) {
+			if (opponentInAttackRange () && !impacted && GetComponent<Animation> ().IsPlaying (attack.name)) {
 				if (GetComponent<Animation> () [attack.name].time > GetComponent<Animation> () [attack.name].length * impactTime) {
-					player.GetComponent<Combat> ().getHit (damage);
+					opponent.GetComponent<Creature> ().getHit (damage, this.gameObject);
 					impacted = true;
 				}
 			}
@@ -168,6 +193,8 @@ public class NPC : MonoBehaviour {
 
 	/* ------------------------------ Live and walk ------------------------------ */
 	protected void live () {
+		opponent = null;
+		aggroMeter = new AggroMeter ();
 		if (walking)
 			goToPosition (currentGoal);
 		else if (Vector3.Distance (startPosition, transform.position) > livingRadius) {
@@ -215,5 +242,32 @@ public class NPC : MonoBehaviour {
 
 	private float relationSpeedToNormalSpeed() {
 		return speed / 3;
+	}
+
+	private bool hasOpponent() {
+		return opponent != null;
+	}
+
+	private void checkRadiusForOpponents() {
+		if (!hasOpponent ()) {
+			float npcDistance = 99999999;
+			foreach (string enemy in enemies) {
+				GameObject[] npcs = GameObject.FindGameObjectsWithTag (enemy);
+				foreach (GameObject npc in npcs) {
+					float distance = Vector3.Distance (npc.transform.position, transform.position);
+					if (distance != 0 && distance < aggroRange) {
+						if (opponent == null || distance < npcDistance) {
+							opponent = npc;
+							npcDistance = distance;
+							lastChaseTime = Time.time;
+						}
+					}
+				}
+			}
+		} else if (Vector3.Distance (opponent.transform.position, transform.position) > aggroRange) {
+			//aggroMeter.deleteAggro (opponent);
+			aggroMeter = new AggroMeter();
+			opponent = null;
+		}
 	}
 }
