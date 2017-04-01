@@ -10,8 +10,6 @@ public class Combat : Creature {
 	public GameObject chaseTarget;
 
 	/* --- Stats --- */
-	public int health = 1000;
-	public int damage = 35;
 	private float opponentTime;
 	private float attackRange = 2f;
 	public double impactTime;
@@ -21,10 +19,10 @@ public class Combat : Creature {
 	public bool gettingHit;
 	public bool chasing;
 
-
 	// Use this for initialization
 	void Start () {
-		
+		health = 1000;
+		damage = 35;		
 	}
 
 	// Update is called once per frame

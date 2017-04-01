@@ -8,19 +8,22 @@ public class Zombie : NPC {
 	void Start () {
 		startPosition = transform.position;
 		health = 100;
-		damage = 10;
+		damage = 8;
 		exp = 60;
-		attackCooldown = 2f;
-		speed = 1f;
+		attackCooldown = 1.5f;
+		speed = 2.5f;
 		aggroRange = 10;
 		attackRange = 2.5f;
 		impactTime = 0.35;
-		chasingTime = 20;
+		chasingTime = 5;
 		livingRadius = 10;
 		lastChaseTime = -(chasingTime + 1);
 		nextWalk = 20;
 		enemies = new ArrayList ();
 		enemies.Add("Fraction1");
 		enemies.Add("Player");
-	}	
+		gameObject .AddComponent<JumpBack>();
+		GetComponent<JumpBack> ().setCreature (gameObject);
+		lastSpecialAttack = Time.time;
+	}
 }

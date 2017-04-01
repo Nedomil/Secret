@@ -12,9 +12,16 @@ abstract public class Creature : MonoBehaviour  {
 	public AnimationClip getHitAnim;
 	public AnimationClip waitingForFight;
 
+	/* --- Stats --- */
+	public int health;
+	protected int damage;
+
 	/* --- Bools --- */
 	public bool isDead;
 	protected bool isCorpse;
+	public bool underAttack;
+	private float lastTimeUnderAttack = 0;
+	private int underAttackCoolDown = 7;
 
 	// Use this for initialization
 	void Start () {
@@ -27,4 +34,14 @@ abstract public class Creature : MonoBehaviour  {
 	}
 
 	public abstract void getHit(int dmg, GameObject opponent);
+
+	protected void checkIfUnderAttack(bool attack) {
+		if (attack) {
+			lastTimeUnderAttack = Time.time;
+			underAttack = true;
+		}
+		else if (lastTimeUnderAttack + underAttackCoolDown < Time.time) {
+			underAttack = false;
+		}
+	}
 }

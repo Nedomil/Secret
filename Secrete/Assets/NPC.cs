@@ -10,8 +10,6 @@ public class NPC : Creature {
 	public GameObject opponent;
 
 	/* --- Stats --- */
-	protected int health;
-	protected int damage;
 	protected int exp;
 	protected float attackCooldown;
 	protected float lastAttack;
@@ -30,6 +28,10 @@ public class NPC : Creature {
 	private bool impacted;
 	private AggroMeter aggroMeter = new AggroMeter ();
 
+	protected float lastSpecialAttack;
+	private int coolDownSpecialAttackMin = 2;
+	private int coolDownSpecialAttackMax = 5;
+
 	/* --- Social --- */
 	protected ArrayList enemies;
 
@@ -37,7 +39,6 @@ public class NPC : Creature {
 	/* --- Bools --- */
 	public bool walking;
 	protected bool gettingHit;
-
 
 	// Use this for initialization
 	void Start () {
@@ -48,9 +49,11 @@ public class NPC : Creature {
 		checkRadiusForOpponents ();
 		if (!isDead) {
 			handleAggro ();
+			checkIfUnderAttack (false);
 			if (!gettingHit) {
 				if (opponentInAttackRange () && !opponent.GetComponent<Creature> ().isDead) {
 					//so the NPC don't attack imediatly after the fight ist starting
+					specialAttack();
 					if (Time.time - lastAttack > 3) {
 						lastAttack = Time.time;
 						GetComponent<Animation> ().CrossFade (waitingForFight.name);
@@ -85,11 +88,7 @@ public class NPC : Creature {
 	* @opponent which is dealing damage
 	*/
 		public override void getHit(int damage, GameObject opponent) {
-		if (this.name == "SkeletonBoss") {
-			Debug.Log (aggroMeter.getOpponentAndAggro (0));
-			Debug.Log (aggroMeter.getOpponentAndAggro (1));
-			Debug.Log (aggroMeter.getOpponentAndAggro (2));
-		}
+		checkIfUnderAttack (true);
 		handleAggro (opponent, damage);
 		GetComponent<Animation> ().CrossFade (getHitAnim.name);
 		GetComponent<Animation> () [getHitAnim.name].time = 0.42f;
@@ -103,7 +102,6 @@ public class NPC : Creature {
 				opponent.GetComponent<Level> ().increaseExp (exp);
 		}
 	}
-
 
 	/*
 	 * Handles @aggroMeter. Adds new oppoennt and changes opponent if a new one
@@ -159,6 +157,9 @@ public class NPC : Creature {
 		}
 	}
 
+	/*
+	 * Returns, if opponent is in attack Range.
+	 */
 	protected bool opponentInAttackRange() {
 		if (opponent == null)
 			return false;
@@ -184,10 +185,49 @@ public class NPC : Creature {
 		}
 	}
 
+	/*
+	 * Handles death of NPC and destroyes the CharacterController.
+	 */
 	protected void dieAndBecomeCorpse() {
 		GetComponent<Animation> ().CrossFade (die.name);
 		isCorpse = true;
 		Destroy (charController);
+	}
+
+	public void specialAttack() {
+		ArrayList specialAttacks = allReadySpecialAttacks ();
+		int countSpecialAttacks = specialAttacks.Count;
+		if (countSpecialAttacks != 0) {
+			int index = (int)Random.value * (countSpecialAttacks - 1);
+			if (Time.time > lastSpecialAttack + coolDownSpecialAttack ()) {
+				lastSpecialAttack = Time.time;
+				Attack attackToDo = (Attack)specialAttacks [index];
+				attackToDo.activate ();
+			}
+		}
+	}
+
+	private ArrayList allReadySpecialAttacks () {
+		Attack[] allAttacks = GetComponents<Attack> ();
+		ArrayList readyAttacks = new ArrayList ();
+		if (allAttacks != null) {
+			foreach (Attack attack in allAttacks) {
+				if (attack.attackReady)
+					readyAttacks.Add (attack);
+			}
+			return readyAttacks;
+		}
+
+		return readyAttacks;
+	}
+
+	private int coolDownSpecialAttack() {
+		int temp = (int) (Random.value * (coolDownSpecialAttackMax - coolDownSpecialAttackMin));
+		return temp + coolDownSpecialAttackMin;
+	}
+
+	private void resetAttackCooldowns() {
+		lastSpecialAttack = Time.time;
 	}
 
 
@@ -195,6 +235,7 @@ public class NPC : Creature {
 	protected void live () {
 		opponent = null;
 		aggroMeter = new AggroMeter ();
+		resetAttackCooldowns ();
 		if (walking)
 			goToPosition (currentGoal);
 		else if (Vector3.Distance (startPosition, transform.position) > livingRadius) {
@@ -248,6 +289,10 @@ public class NPC : Creature {
 		return opponent != null;
 	}
 
+	/*
+	 * Checks the aggroRange for enemies and chose the next one. Only works if there isn't
+	 * an opponent declared as @opponent.
+	 */
 	private void checkRadiusForOpponents() {
 		if (!hasOpponent ()) {
 			float npcDistance = 99999999;

@@ -7,11 +7,11 @@ public class Skeleton : NPC {
 	// Use this for initialization
 	void Start () {
 		startPosition = transform.position;
-		health = 500;
-		damage = 5;
+		health = 150;
+		damage = 10;
 		exp = 60;
-		attackCooldown = 1.5f;
-		speed = 2.5f;
+		attackCooldown = 2f;
+		speed = 2f;
 		aggroRange = 10;
 		attackRange = 2.5f;
 		impactTime = 0.35;
@@ -22,5 +22,6 @@ public class Skeleton : NPC {
 		enemies = new ArrayList ();
 		enemies.Add ("Fraction2");
 		enemies.Add("Player");
-	}
+		lastSpecialAttack = Time.time;
+	}	
 }
