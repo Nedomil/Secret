@@ -13,9 +13,10 @@ public class NPC : Creature {
 	protected int exp;
 	protected float attackCooldown;
 	protected float lastAttack;
+	protected Attack mainAttack;
 	protected float speed;
 	protected float aggroRange;
-	protected float attackRange;
+	public float weaponRange;
 	protected float livingRadius;
 	protected float chasingTime;
 	protected float lastChaseTime;
@@ -25,7 +26,6 @@ public class NPC : Creature {
 	public Vector3 startPosition;
 	private int rotationSpeed = 10;				//Time to rotate
 	public double impactTime;
-	private bool impacted;
 	private AggroMeter aggroMeter = new AggroMeter ();
 
 	protected float lastSpecialAttack;
@@ -38,7 +38,8 @@ public class NPC : Creature {
 
 	/* --- Bools --- */
 	public bool walking;
-	protected bool gettingHit;
+	public bool gettingHit;
+	public bool attacking;
 
 	// Use this for initialization
 	void Start () {
@@ -51,25 +52,14 @@ public class NPC : Creature {
 			handleAggro ();
 			checkIfUnderAttack (false);
 			if (!gettingHit) {
-				if (opponentInAttackRange () && !opponent.GetComponent<Creature> ().isDead) {
-					//so the NPC don't attack imediatly after the fight ist starting
-					specialAttack();
-					if (Time.time - lastAttack > 3) {
-						lastAttack = Time.time;
-						GetComponent<Animation> ().CrossFade (waitingForFight.name);
-					}
-					transform.LookAt (opponent.transform.position);
-					//Only attacks if cooldow is over
-					if (Time.time > attackCooldown + lastAttack) {
-						GetComponent<Animation> ().CrossFade (attack.name);
-						lastAttack = Time.time;
-					}
-				} else if ((hasOpponent () && npcInChasingTime ()) && !opponent.GetComponent<Creature> ().isDead)					
-					chase ();
-				else
+				if (hasOpponent ()) {
+					if (!opponent.GetComponent<Creature> ().isDead && !specialAttack () && npcInChasingTime ()) {
+						chase ();
+					} else if (Vector3.Distance (transform.position, opponent.transform.position) > 2)
+						lastChaseTime = Time.time;
+				} else {
 					live ();
-
-				impact ();
+				}
 			}
 			resetGettingHit ();
 
@@ -150,39 +140,20 @@ public class NPC : Creature {
 			lastChaseTime = Time.time;
 		transform.LookAt (opponent.transform.position);
 		if (Vector3.Distance (transform.position, opponent.transform.position) > 2) {
-			charController.SimpleMove (transform.forward * speed);
-			GetComponent<Animation> ().CrossFade (run.name);
+			if (!attacking && !isInAttackRange ()) {
+				charController.SimpleMove (transform.forward * speed);
+				GetComponent<Animation> ().CrossFade (run.name);
+			}
 		} else {
 			lastAttack = Time.time;
+			if(GetComponent<Animation>().IsPlaying(run.name))			//else NPC would permanently be waiting for fight if he's near enaugh
+				GetComponent<Animation> ().CrossFade (waitingForFight.name);
 		}
-	}
-
-	/*
-	 * Returns, if opponent is in attack Range.
-	 */
-	protected bool opponentInAttackRange() {
-		if (opponent == null)
-			return false;
-		return Vector3.Distance (transform.position, opponent.transform.position) < attackRange;
 	}
 
 	protected void resetGettingHit() {
 		if (!GetComponent<Animation> ().IsPlaying (getHitAnim.name))
 			gettingHit = false;
-	}
-
-	protected void impact() {
-		if (!gettingHit) {
-			if (GetComponent<Animation> () [attack.name].time < GetComponent<Animation> () [attack.name].length * 0.1) {
-				impacted = false;
-			}
-			if (opponentInAttackRange () && !impacted && GetComponent<Animation> ().IsPlaying (attack.name)) {
-				if (GetComponent<Animation> () [attack.name].time > GetComponent<Animation> () [attack.name].length * impactTime) {
-					opponent.GetComponent<Creature> ().getHit (damage, this.gameObject);
-					impacted = true;
-				}
-			}
-		}
 	}
 
 	/*
@@ -191,10 +162,11 @@ public class NPC : Creature {
 	protected void dieAndBecomeCorpse() {
 		GetComponent<Animation> ().CrossFade (die.name);
 		isCorpse = true;
+		gameObject.tag = "Corpse";
 		Destroy (charController);
 	}
 
-	public void specialAttack() {
+	public bool specialAttack() {
 		ArrayList specialAttacks = allReadySpecialAttacks ();
 		int countSpecialAttacks = specialAttacks.Count;
 		if (countSpecialAttacks != 0) {
@@ -202,9 +174,12 @@ public class NPC : Creature {
 			if (Time.time > lastSpecialAttack + coolDownSpecialAttack ()) {
 				lastSpecialAttack = Time.time;
 				Attack attackToDo = (Attack)specialAttacks [index];
-				attackToDo.activate ();
+				return attackToDo.activate ();
 			}
+		} else {
+			return mainAttack.activate ();
 		}
+		return false;
 	}
 
 	private ArrayList allReadySpecialAttacks () {
@@ -228,6 +203,11 @@ public class NPC : Creature {
 
 	private void resetAttackCooldowns() {
 		lastSpecialAttack = Time.time;
+	}
+
+	private bool isInAttackRange() {
+		float attackRange = mainAttack.attackRange;
+		return attackRange > Vector3.Distance (opponent.transform.position, transform.position);
 	}
 
 
@@ -286,6 +266,8 @@ public class NPC : Creature {
 	}
 
 	private bool hasOpponent() {
+		if (opponent != null && opponent.GetComponent<Creature> ().isDead)
+			opponent = null;
 		return opponent != null;
 	}
 
@@ -294,7 +276,7 @@ public class NPC : Creature {
 	 * an opponent declared as @opponent.
 	 */
 	private void checkRadiusForOpponents() {
-		if (!hasOpponent ()) {
+		if (!hasOpponent () || opponent.GetComponent<Creature>().isDead) {
 			float npcDistance = 99999999;
 			foreach (string enemy in enemies) {
 				GameObject[] npcs = GameObject.FindGameObjectsWithTag (enemy);

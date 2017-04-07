@@ -4,11 +4,15 @@ using UnityEngine;
 
 abstract public class Attack : MonoBehaviour {
 
-	public GameObject creature;
+	protected NPC npc;
 	protected float lastSpecialAttack;
 	protected int coolDownSpecialAttackMin;
 	protected int coolDownSpecialAttackMax;
 	public bool attackReady = false;
+	public float effectivelyAttackRange;
+	public float attackRange;
+	protected float damageMultiplicator;
+	protected int damage;
 
 	// Use this for initialization
 	void Start () {
@@ -20,14 +24,12 @@ abstract public class Attack : MonoBehaviour {
 		
 	}
 
-	public virtual void activate () {
+	public abstract bool activate ();
+
+	protected void setUpActivate() {
 		lastSpecialAttack = Time.time;
 		attackReady = false;
 	}
-
-	public void setCreature(GameObject creature) {
-		this.creature = creature;
-	}	
 
 	protected void readyCheck() {
 		if (Time.time > lastSpecialAttack + coolDownSpecialAttack()) {
@@ -38,5 +40,17 @@ abstract public class Attack : MonoBehaviour {
 	private int coolDownSpecialAttack() {
 		int temp = (int) (Random.value * (coolDownSpecialAttackMax - coolDownSpecialAttackMin));
 		return temp + coolDownSpecialAttackMin;
+	}
+
+
+
+	/*
+	 * Returns, if opponent is in attack Range.
+	 */
+	public virtual bool opponentInAttackRange() {
+		GameObject opponent = npc.opponent;
+		if (opponent == null)
+			return false;
+		return Vector3.Distance (transform.position, opponent.transform.position) < attackRange;
 	}
 }

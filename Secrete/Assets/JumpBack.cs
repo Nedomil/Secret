@@ -20,7 +20,7 @@ public class JumpBack : Attack {
 	
 	// Update is called once per frame
 	void Update () {
-		if (isJumping && position != destination && creature != null && GetComponent<Creature> ().underAttack) {
+		if (isJumping && position != destination && GetComponent<Creature> ().underAttack) {
 			transform.position = Vector3.MoveTowards (transform.position, destination, speed);
 			if (transform.position == destination)
 				isJumping = false;
@@ -28,15 +28,16 @@ public class JumpBack : Attack {
 			readyCheck ();
 	}
 
-	public override void activate() {
-		base.activate ();
-		position = creature.transform.position;
+	public override bool activate() {
+		setUpActivate ();
+		position = transform.position;
 		destination = calculateDestination();
 		isJumping = true;
+		return true;
 	}
 
 	private Vector3 calculateDestination() {
-		Vector3 destTemp = position - jumpSize * creature.transform.forward;
+		Vector3 destTemp = position - jumpSize * transform.forward;
 		return (Vector3)Random.onUnitSphere * jumpRadius + destTemp;
 	}
 
@@ -46,5 +47,9 @@ public class JumpBack : Attack {
 
 	public int getJumpSize() {
 		return jumpSize;
+	}
+
+	public override bool opponentInAttackRange() {
+		return true;
 	}
 }

@@ -48,13 +48,18 @@
   <ItemGroup>
      <Compile Include="Assets\AggroMeter.cs" />
      <Compile Include="Assets\Attack.cs" />
+     <Compile Include="Assets\CastAttack.cs" />
      <Compile Include="Assets\ClickToMove.cs" />
      <Compile Include="Assets\Combat.cs" />
      <Compile Include="Assets\Creature.cs" />
+     <Compile Include="Assets\Fireball.cs" />
      <Compile Include="Assets\JumpBack.cs" />
      <Compile Include="Assets\Level.cs" />
      <Compile Include="Assets\NPC.cs" />
+     <Compile Include="Assets\NormalMeleeAttack.cs" />
+     <Compile Include="Assets\Projectile.cs" />
      <Compile Include="Assets\Skeleton.cs" />
+     <Compile Include="Assets\SkeletonMage.cs" />
      <Compile Include="Assets\SmoothFollow.cs" />
      <Compile Include="Assets\Zombie.cs" />
      <None Include="Assets\SkeletonData\animations.txt" />

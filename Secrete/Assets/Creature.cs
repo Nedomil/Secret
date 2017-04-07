@@ -14,7 +14,7 @@ abstract public class Creature : MonoBehaviour  {
 
 	/* --- Stats --- */
 	public int health;
-	protected int damage;
+	public int damage;
 
 	/* --- Bools --- */
 	public bool isDead;
@@ -40,8 +40,7 @@ abstract public class Creature : MonoBehaviour  {
 			lastTimeUnderAttack = Time.time;
 			underAttack = true;
 		}
-		else if (lastTimeUnderAttack + underAttackCoolDown < Time.time) {
-			underAttack = false;
-		}
+		else
+			underAttack = lastTimeUnderAttack + underAttackCoolDown > Time.time;
 	}
 }

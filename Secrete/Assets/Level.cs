@@ -15,6 +15,8 @@ public class Level : MonoBehaviour {
 		expNeeded.Add (100);
 		expNeeded.Add (250);
 		expNeeded.Add (450);
+		expNeeded.Add (600);
+		expNeeded.Add (999999999);
 	}
 	
 	// Update is called once per frame

@@ -13,7 +13,7 @@ public class Zombie : NPC {
 		attackCooldown = 1.5f;
 		speed = 2.5f;
 		aggroRange = 10;
-		attackRange = 2.5f;
+		weaponRange = 2.5f;
 		impactTime = 0.35;
 		chasingTime = 5;
 		livingRadius = 10;
@@ -23,7 +23,8 @@ public class Zombie : NPC {
 		enemies.Add("Fraction1");
 		enemies.Add("Player");
 		gameObject .AddComponent<JumpBack>();
-		GetComponent<JumpBack> ().setCreature (gameObject);
+		gameObject.AddComponent<NormalMeleeAttack> ();
+		mainAttack = GetComponent<NormalMeleeAttack> ();
 		lastSpecialAttack = Time.time;
 	}
 }

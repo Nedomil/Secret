@@ -70,7 +70,8 @@ public class Combat : Creature {
 	private void impact() {
 		if (opponent != null && !impacted && GetComponent<Animation>().IsPlaying (attack.name)) {
 			if (GetComponent<Animation> () [attack.name].time > GetComponent<Animation> () [attack.name].length * impactTime) {
-				opponent.GetComponent<NPC> ().getHit (damage, player);
+				if(opponentInAttackRange())
+					opponent.GetComponent<NPC> ().getHit (damage, player);
 				impacted = true;
 			}
 		}
@@ -107,7 +108,7 @@ public class Combat : Creature {
 	private void chase() {
 		if (chasing) {
 			transform.LookAt (chaseTarget.transform.position);
-			if (Vector3.Distance (transform.position, chaseTarget.transform.position) > 2) {
+			if (!opponentInAttackRange()) {
 				GetComponent<CharacterController> ().SimpleMove (transform.forward * GetComponent<ClickToMove> ().speed);
 				GetComponent<Animation> ().CrossFade (run.name);
 			} else {
@@ -117,5 +118,9 @@ public class Combat : Creature {
 				ClickToMove.isAttacking = true;
 			}
 		}
+	}
+
+	private bool opponentInAttackRange() {
+		return Vector3.Distance (transform.position, chaseTarget.transform.position) < 3;
 	}
 }
