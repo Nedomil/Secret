@@ -47,8 +47,9 @@ public class NPC : Creature {
 
 	// Update is called once per frame
 	void Update () {
-		checkRadiusForOpponents ();
+		//Debug.Log (!specialAttack ());
 		if (!isDead) {
+			checkRadiusForOpponents ();
 			handleAggro ();
 			checkIfUnderAttack (false);
 			if (!gettingHit) {
@@ -136,7 +137,7 @@ public class NPC : Creature {
 	*/
 	protected void chase() {
 		// if player isn't in range, the chasingTime will stop updating
-		if (hasOpponent ())
+		if (opponentInAggroRange())
 			lastChaseTime = Time.time;
 		transform.LookAt (opponent.transform.position);
 		if (Vector3.Distance (transform.position, opponent.transform.position) > 2) {
@@ -167,6 +168,8 @@ public class NPC : Creature {
 	}
 
 	public bool specialAttack() {
+		if(GetComponent<Animation>().IsPlaying(run.name))			//else NPC would permanently be waiting for fight if he's near enaugh
+			GetComponent<Animation> ().CrossFade (waitingForFight.name);
 		ArrayList specialAttacks = allReadySpecialAttacks ();
 		int countSpecialAttacks = specialAttacks.Count;
 		if (countSpecialAttacks != 0) {
@@ -203,6 +206,10 @@ public class NPC : Creature {
 
 	private void resetAttackCooldowns() {
 		lastSpecialAttack = Time.time;
+	}
+
+	private bool opponentInAggroRange() {
+		return Vector3.Distance(transform.position, opponent.transform.position) < aggroRange;
 	}
 
 	private bool isInAttackRange() {
@@ -291,7 +298,7 @@ public class NPC : Creature {
 					}
 				}
 			}
-		} else if (Vector3.Distance (opponent.transform.position, transform.position) > aggroRange) {
+		} else if (Vector3.Distance (opponent.transform.position, transform.position) > aggroRange && !npcInChasingTime()) {
 			//aggroMeter.deleteAggro (opponent);
 			aggroMeter = new AggroMeter();
 			opponent = null;

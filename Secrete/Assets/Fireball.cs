@@ -24,7 +24,7 @@ public class Fireball : CastAttack {
 			npc.GetComponent<Animation> ().CrossFade (npc.attack.name);
 			startPosition = npc.transform.position;
 			endPosition = npc.opponent.transform.position;
-			make ("Fireball2");
+			make ("Fireball");
 			return true;
 		}
 		return false;
