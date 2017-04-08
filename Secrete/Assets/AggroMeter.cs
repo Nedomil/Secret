@@ -27,13 +27,13 @@ public class AggroMeter {
 			}
 		}
 		if (!opponentAlreadyInList) {
-			int aggroToAd;
+			int aggroToAdd;
 			if (opponents.Count == 0)
-				aggroToAd = AGGRO_MULITIPLICATOR_FOR_FIRST_HIT * dmg;
+				aggroToAdd = AGGRO_MULITIPLICATOR_FOR_FIRST_HIT * dmg;
 			else 
-				aggroToAd = dmg;
+				aggroToAdd = dmg;
 			opponents.Add (opponent);
-			aggro.Add (aggroToAd);
+			aggro.Add (aggroToAdd);
 		}
 	}
 

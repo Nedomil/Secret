@@ -5,7 +5,7 @@ using UnityEngine;
 public class Combat : Creature {
 
 	/* --- Objects --- */
-	private GameObject opponent;
+	public GameObject opponent;
 	public GameObject player;
 	public GameObject chaseTarget;
 

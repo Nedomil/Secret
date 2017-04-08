@@ -7,6 +7,7 @@ public class ClickToMove : MonoBehaviour {
 	/* --- AnimationClips --- */
 	public AnimationClip run;
 	public AnimationClip idle;
+	public AnimationClip getHitAnim;
 
 	/* --- Objects --- */
 	public CharacterController charController;
@@ -32,8 +33,9 @@ public class ClickToMove : MonoBehaviour {
 			//Locate where the player clicked on the terrain
 			locateMousePosition();
 		}
-		//Move the player to the position
-		moveToPosition();
+		//Move the player to the position if not getting hit.
+		if(!GetComponent<Animation>().IsPlaying(getHitAnim.name))
+			moveToPosition();
 	}
 
 	private void locateMousePosition() {
