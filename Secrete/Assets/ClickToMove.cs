@@ -34,7 +34,7 @@ public class ClickToMove : MonoBehaviour {
 			locateMousePosition();
 		}
 		//Move the player to the position if not getting hit.
-		if(!GetComponent<Animation>().IsPlaying(getHitAnim.name))
+		if(!GetComponent<Combat>().chasing && !GetComponent<Animation>().IsPlaying(getHitAnim.name))
 			moveToPosition();
 	}
 
@@ -43,7 +43,7 @@ public class ClickToMove : MonoBehaviour {
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 
 		//ray, returns hit, length of ray
-		if(Physics.Raycast(ray, out hit, 1000) && hit.collider.tag != "Enemy") {
+		if(Physics.Raycast(ray, out hit, 1000) && hit.collider.tag != "Fraction1" && hit.collider.tag != "Fraction2") {
 			GetComponent<Combat> ().chasing = false;
 			position = new Vector3 (hit.point.x, hit.point.y, hit.point.z);
 		}

@@ -5,37 +5,45 @@ using UnityEngine;
 public class Combat : Creature {
 
 	/* --- Objects --- */
-	public GameObject opponent;
 	public GameObject player;
 	public GameObject chaseTarget;
 
 	/* --- Stats --- */
 	private float opponentTime;
-	private float attackRange = 2f;
-	public double impactTime;
-	private bool impacted;
 
 	/* --- Bools --- */
-	public bool gettingHit;
 	public bool chasing;
+
+	/* --- Attacks --- */
+	private Attack mainAttack;
 
 	// Use this for initialization
 	void Start () {
 		health = 1000;
-		damage = 35;		
+		damage = 35;
+		weaponRange = 2f;
+		setUpMainAttack ();
+	}
+
+	private void setUpMainAttack() {
+		gameObject.AddComponent<NormalMeleeAttack> ();
+		mainAttack = GetComponent<NormalMeleeAttack> ();
+		mainAttack.defaultCooldown = false;
+		mainAttack.coolDownSpecialAttackMax = 1;
+		mainAttack.coolDownSpecialAttackMin = 1;
 	}
 
 	// Update is called once per frame
 	void Update () {
+		//Debug.Log(Vector3.Distance(transform.position, opponent.transform.position));
+		//Debug.Log (chasing);
 		RaycastHit hit;
 		if (!isDead) {
 			if (!gettingHit) {
 				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 				if (Physics.Raycast (ray, out hit, 1000)) {
 					if ((hit.collider.tag == "Fraction1" || hit.collider.tag == "Fraction2") && Input.GetMouseButtonDown (0)) {
-						if (Vector3.Distance (transform.position, opponent.transform.position) < attackRange) {
-							transform.LookAt (opponent.transform.position);
-							GetComponent<Animation> ().CrossFade (attack.name);
+						if (!GetComponent<Animation>().IsPlaying(attack.name) && mainAttack.activate()) {
 							ClickToMove.isAttacking = true;
 						} else {
 							chaseTarget = opponent;
@@ -47,11 +55,8 @@ public class Combat : Creature {
 
 				if (!GetComponent<Animation> ().IsPlaying (attack.name)) {
 					ClickToMove.isAttacking = false;
-					impacted = false;
 				}
 				resetOpponent ();
-
-				impact ();
 			}
 			resetGettingHit ();
 		} else {
@@ -65,16 +70,6 @@ public class Combat : Creature {
 	private void resetGettingHit() {
 		if (!GetComponent<Animation> ().IsPlaying (getHitAnim.name))
 			gettingHit = false;
-	}
-
-	private void impact() {
-		if (opponent != null && !impacted && GetComponent<Animation>().IsPlaying (attack.name)) {
-			if (GetComponent<Animation> () [attack.name].time > GetComponent<Animation> () [attack.name].length * impactTime) {
-				if(opponentInAttackRange())
-					opponent.GetComponent<NPC> ().getHit (damage, player);
-				impacted = true;
-			}
-		}
 	}
 
 	public override void getHit(int damage, GameObject opponent) {
@@ -108,19 +103,16 @@ public class Combat : Creature {
 	private void chase() {
 		if (chasing) {
 			transform.LookAt (chaseTarget.transform.position);
-			if (!opponentInAttackRange()) {
+			if (!mainAttack.opponentInAttackRange()) {
 				GetComponent<CharacterController> ().SimpleMove (transform.forward * GetComponent<ClickToMove> ().speed);
 				GetComponent<Animation> ().CrossFade (run.name);
 			} else {
-				chasing = false;
-				GetComponent<ClickToMove>().position = transform.position;
-				GetComponent<Animation> ().CrossFade (attack.name);
-				ClickToMove.isAttacking = true;
+				if (mainAttack.activate()) {
+					chasing = false;
+					GetComponent<ClickToMove> ().position = transform.position;
+					ClickToMove.isAttacking = true;
+				}
 			}
 		}
-	}
-
-	private bool opponentInAttackRange() {
-		return Vector3.Distance (transform.position, chaseTarget.transform.position) < 3;
 	}
 }

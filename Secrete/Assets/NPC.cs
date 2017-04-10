@@ -7,7 +7,6 @@ public class NPC : Creature {
 	/* --- Objects --- */
 	public CharacterController charController;
 	public Transform player;
-	public GameObject opponent;
 
 	/* --- Stats --- */
 	protected int exp;
@@ -16,7 +15,6 @@ public class NPC : Creature {
 	protected Attack mainAttack;
 	protected float speed;
 	protected float aggroRange;
-	public float weaponRange;
 	protected float livingRadius;
 	protected float chasingTime;
 	protected float lastChaseTime;
@@ -25,7 +23,6 @@ public class NPC : Creature {
 	private Vector3 currentGoal;
 	public Vector3 startPosition;
 	private int rotationSpeed = 10;				//Time to rotate
-	public double impactTime;
 	private AggroMeter aggroMeter = new AggroMeter ();
 
 	protected float lastSpecialAttack;
@@ -38,8 +35,6 @@ public class NPC : Creature {
 
 	/* --- Bools --- */
 	public bool walking;
-	public bool gettingHit;
-	public bool attacking;
 
 	// Use this for initialization
 	void Start () {

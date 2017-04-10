@@ -9,14 +9,16 @@ public class NormalMeleeAttack : Attack {
 
 	// Use this for initialization
 	void Start () {
-		npc = GetComponent<NPC> ();
+		creature = GetComponent<Creature> ();
 		lastSpecialAttack = Time.time;
-		coolDownSpecialAttackMin = 3;
-		coolDownSpecialAttackMax = 3;
+		if (defaultCooldown) {
+			coolDownSpecialAttackMin = 3;
+			coolDownSpecialAttackMax = 3;
+		}
 		effectivelyAttackRange = 1;
-		attackRange = effectivelyAttackRange * npc.weaponRange;
+		attackRange = effectivelyAttackRange * creature.weaponRange;
 		damageMultiplicator = 1;
-		damage = (int) damageMultiplicator * npc.damage;
+		damage = (int) damageMultiplicator * creature.damage;
 	}
 
 	// Update is called once per frame
@@ -27,32 +29,32 @@ public class NormalMeleeAttack : Attack {
 	}
 
 	public override bool activate() {
-		if(opponentInAttackRange() && attackReady && !npc.GetComponent<Animation>().IsPlaying(npc.attack.name)) {
+		if(opponentInAttackRange() && attackReady && !creature.GetComponent<Animation>().IsPlaying(creature.attack.name)) {
 			setUpActivate ();
 			isAttacking = true;
-			transform.LookAt (npc.opponent.transform.position);
-			GetComponent<Animation> ().CrossFade (npc.attack.name);
+			transform.LookAt (creature.opponent.transform.position);
+			GetComponent<Animation> ().CrossFade (creature.attack.name);
 			return true;
 		}
 		return false;
 	}
 
 	private void stopAttackAnimation() {
-		if (npc.GetComponent<Animation> ().IsPlaying (npc.attack.name) &&
-		   GetComponent<Animation> () [npc.attack.name].time > GetComponent<Animation> () [npc.attack.name].length * 0.95) {
-			GetComponent<Animation> ().CrossFade (npc.waitingForFight.name);
+		if (isAttacking && creature.GetComponent<Animation> ().IsPlaying (creature.attack.name) &&
+			GetComponent<Animation> () [creature.attack.name].time > GetComponent<Animation> () [creature.attack.name].length * 0.8) {
+			GetComponent<Animation> ().CrossFade (creature.waitingForFight.name);
 			isAttacking = false;
 		}
 	}
 
-	protected void impact() {
-		if (!npc.gettingHit) {
-			if (GetComponent<Animation> () [npc.attack.name].time < GetComponent<Animation> () [npc.attack.name].length * 0.1) {
+	private void impact() {
+		if (!creature.gettingHit && isAttacking) {
+			if (GetComponent<Animation> () [creature.attack.name].time < GetComponent<Animation> () [creature.attack.name].length * 0.1) {
 				impacted = false;
 			}
-			if (opponentInAttackRange () && !impacted && GetComponent<Animation> ().IsPlaying (npc.attack.name)) {
-				if (GetComponent<Animation> () [npc.attack.name].time > GetComponent<Animation> () [npc.attack.name].length * npc.impactTime && opponentInAttackRange()) {
-					npc.opponent.GetComponent<Creature> ().getHit (damage, this.gameObject);
+			if (opponentInAttackRange () && !impacted && GetComponent<Animation> ().IsPlaying (creature.attack.name)) {
+				if (GetComponent<Animation> () [creature.attack.name].time > GetComponent<Animation> () [creature.attack.name].length * creature.impactTime && opponentInAttackRange()) {
+					creature.opponent.GetComponent<Creature> ().getHit (damage, this.gameObject);
 					impacted = true;
 				}
 			}
