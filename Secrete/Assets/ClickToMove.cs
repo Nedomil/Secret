@@ -17,10 +17,6 @@ public class ClickToMove : MonoBehaviour {
 	public Vector3 position;
 	private int rotationSpeed = 10;	//Time to rotate
 
-	/* --- Bools --- */
-	public static bool isAttacking;
-
-
 
 	// Use this for initialization
 	void Start () {
@@ -34,8 +30,10 @@ public class ClickToMove : MonoBehaviour {
 			locateMousePosition();
 		}
 		//Move the player to the position if not getting hit.
-		if(!GetComponent<Combat>().chasing && !GetComponent<Animation>().IsPlaying(getHitAnim.name))
-			moveToPosition();
+		if (!GetComponent<Combat> ().chasing && !GetComponent<Animation> ().IsPlaying (getHitAnim.name) && !attackGoingOn ())
+			moveToPosition ();
+		else
+			position = transform.position;
 	}
 
 	private void locateMousePosition() {
@@ -64,8 +62,17 @@ public class ClickToMove : MonoBehaviour {
 		}
 		//Player is not moving
 		else {
-			if(!isAttacking && !GetComponent<Combat>().gettingHit)
+			if(!attackGoingOn() && !GetComponent<Combat>().gettingHit)
 				GetComponent<Animation> ().CrossFade (idle.name);
 		}
+	}
+
+	private bool attackGoingOn () {
+		Attack[] attacks = GetComponents<Attack> ();
+		foreach (Attack attack in attacks) {
+			if (attack.isAttacking)
+				return true;
+		}
+		return false;
 	}
 }

@@ -74,18 +74,20 @@ public class NPC : Creature {
 	* @opponent which is dealing damage
 	*/
 		public override void getHit(int damage, GameObject opponent) {
-		checkIfUnderAttack (true);
-		handleAggro (opponent, damage);
-		GetComponent<Animation> ().CrossFade (getHitAnim.name);
-		GetComponent<Animation> () [getHitAnim.name].time = 0.42f;
-		lastAttack += 0.5f;
-		gettingHit = true;
-		health -= damage;
-		if (health < 0) {
-			health = 0;
-			isDead = true;
-			if (opponent.name == "Player")
-				opponent.GetComponent<Level> ().increaseExp (exp);
+		if (!isDead) {
+			checkIfUnderAttack (true);
+			handleAggro (opponent, damage);
+			GetComponent<Animation> ().CrossFade (getHitAnim.name);
+			GetComponent<Animation> () [getHitAnim.name].time = 0.42f;
+			lastAttack += 0.5f;
+			gettingHit = true;
+			health -= damage;
+			if (health < 0) {
+				health = 0;
+				isDead = true;
+				if (opponent.name == "Player")
+					opponent.GetComponent<Level> ().increaseExp (exp);
+			}
 		}
 	}
 

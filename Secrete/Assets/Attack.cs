@@ -15,6 +15,7 @@ abstract public class Attack : MonoBehaviour {
 	protected int damage;
 
 
+	public bool isAttacking;
 	public bool defaultCooldown = true;
 
 	// Use this for initialization
@@ -27,11 +28,15 @@ abstract public class Attack : MonoBehaviour {
 		
 	}
 
-	public abstract bool activate ();
+	public virtual bool activate () {
+		setUpActivate ();
+		return false;
+	}
 
 	protected void setUpActivate() {
 		lastSpecialAttack = Time.time;
 		attackReady = false;
+		isAttacking = true;
 	}
 
 	protected void readyCheck() {
@@ -45,7 +50,13 @@ abstract public class Attack : MonoBehaviour {
 		return temp + coolDownSpecialAttackMin;
 	}
 
-
+	protected void stopAttackAnimation() {
+		if (isAttacking && creature.GetComponent<Animation> ().IsPlaying (creature.attack.name) &&
+			GetComponent<Animation> () [creature.attack.name].time > GetComponent<Animation> () [creature.attack.name].length * 0.8) {
+			GetComponent<Animation> ().CrossFade (creature.waitingForFight.name);
+			isAttacking = false;
+		}
+	}
 
 	/*
 	 * Returns, if opponent is in attack Range.

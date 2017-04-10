@@ -15,7 +15,7 @@ public class Projectile : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		startPosition.y += height;
-		endPosition.y += height;
+		endPosition.y = startPosition.y;
 		transform.position = startPosition;
 		transform.LookAt (endPosition);
 		//transform.position += transform.forward;  //becouse selfhit.

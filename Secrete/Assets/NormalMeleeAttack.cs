@@ -5,7 +5,6 @@ using UnityEngine;
 public class NormalMeleeAttack : Attack {
 
 	private bool impacted;
-	public bool isAttacking;
 
 	// Use this for initialization
 	void Start () {
@@ -31,20 +30,11 @@ public class NormalMeleeAttack : Attack {
 	public override bool activate() {
 		if(opponentInAttackRange() && attackReady && !creature.GetComponent<Animation>().IsPlaying(creature.attack.name)) {
 			setUpActivate ();
-			isAttacking = true;
 			transform.LookAt (creature.opponent.transform.position);
 			GetComponent<Animation> ().CrossFade (creature.attack.name);
 			return true;
 		}
 		return false;
-	}
-
-	private void stopAttackAnimation() {
-		if (isAttacking && creature.GetComponent<Animation> ().IsPlaying (creature.attack.name) &&
-			GetComponent<Animation> () [creature.attack.name].time > GetComponent<Animation> () [creature.attack.name].length * 0.8) {
-			GetComponent<Animation> ().CrossFade (creature.waitingForFight.name);
-			isAttacking = false;
-		}
 	}
 
 	private void impact() {

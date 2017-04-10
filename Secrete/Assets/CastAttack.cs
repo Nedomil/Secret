@@ -19,8 +19,10 @@ public class CastAttack : Attack {
 	// Update is called once per frame§
 	void Update () {
 		readyCheck ();
-		if (GetComponent<Animation> () [creature.attack.name].time > GetComponent<Animation> () [creature.attack.name].length * 0.95) {
+		stopAttackAnimation ();
+		if (isAttacking && GetComponent<Animation> () [creature.attack.name].time > GetComponent<Animation> () [creature.attack.name].length * 0.95) {
 			creature.attacking = false;
+			isAttacking = false;
 		}
 	}
 

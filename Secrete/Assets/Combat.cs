@@ -16,6 +16,7 @@ public class Combat : Creature {
 
 	/* --- Attacks --- */
 	private Attack mainAttack;
+	private Attack attack1;
 
 	// Use this for initialization
 	void Start () {
@@ -23,6 +24,7 @@ public class Combat : Creature {
 		damage = 35;
 		weaponRange = 2f;
 		setUpMainAttack ();
+		setUp1 ();
 	}
 
 	private void setUpMainAttack() {
@@ -33,30 +35,36 @@ public class Combat : Creature {
 		mainAttack.coolDownSpecialAttackMin = 1;
 	}
 
+	private void setUp1() {
+		gameObject.AddComponent<Fireball> ();
+		attack1 = GetComponent<Fireball> ();
+		attack1.defaultCooldown = false;
+		attack1.coolDownSpecialAttackMax = 6;
+		attack1.coolDownSpecialAttackMin = 6;
+	}
+
 	// Update is called once per frame
 	void Update () {
-		//Debug.Log(Vector3.Distance(transform.position, opponent.transform.position));
-		//Debug.Log (chasing);
 		RaycastHit hit;
 		if (!isDead) {
 			if (!gettingHit) {
-				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-				if (Physics.Raycast (ray, out hit, 1000)) {
-					if ((hit.collider.tag == "Fraction1" || hit.collider.tag == "Fraction2") && Input.GetMouseButtonDown (0)) {
-						if (!GetComponent<Animation>().IsPlaying(attack.name) && mainAttack.activate()) {
-							ClickToMove.isAttacking = true;
-						} else {
-							chaseTarget = opponent;
-							chasing = true;
-							chase ();
+				if (Input.GetKey (KeyCode.Alpha1)) {
+					attack1.activate ();
+				} else {
+					Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+					if (Physics.Raycast (ray, out hit, 1000)) {
+						if ((hit.collider.tag == "Fraction1" || hit.collider.tag == "Fraction2") && Input.GetMouseButtonDown (0)) {
+							if (!GetComponent<Animation> ().IsPlaying (attack.name) && mainAttack.activate ()) {
+								//do nothing. Why?
+							} else {
+								chaseTarget = opponent;
+								chasing = true;
+								chase ();
+							}
 						}
 					}
+					resetOpponent ();
 				}
-
-				if (!GetComponent<Animation> ().IsPlaying (attack.name)) {
-					ClickToMove.isAttacking = false;
-				}
-				resetOpponent ();
 			}
 			resetGettingHit ();
 		} else {
@@ -73,13 +81,15 @@ public class Combat : Creature {
 	}
 
 	public override void getHit(int damage, GameObject opponent) {
-		GetComponent<Animation> ().CrossFade (getHitAnim.name);
-		GetComponent<Animation> () [getHitAnim.name].time = 0.42f;
-		gettingHit = true;
-		health -= damage;
-		if (health < 0) {
-			health = 0;
-			isDead = true;
+		if (!isDead) {
+			GetComponent<Animation> ().CrossFade (getHitAnim.name);
+			GetComponent<Animation> () [getHitAnim.name].time = 0.42f;
+			gettingHit = true;
+			health -= damage;
+			if (health < 0) {
+				health = 0;
+				isDead = true;
+			}
 		}
 	}
 
@@ -110,7 +120,6 @@ public class Combat : Creature {
 				if (mainAttack.activate()) {
 					chasing = false;
 					GetComponent<ClickToMove> ().position = transform.position;
-					ClickToMove.isAttacking = true;
 				}
 			}
 		}
