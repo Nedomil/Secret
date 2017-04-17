@@ -72,7 +72,6 @@ public class Inventory : MonoBehaviour {
 		if (inventoryShown) {
 			drawInventory ();
 			drawSlots ();
-			drawItems ();
 			detectGUIAction ();
 			draggingItem ();
 		}
@@ -145,7 +144,7 @@ public class Inventory : MonoBehaviour {
 		if (draggedItem != null && Input.GetMouseButton (0)) {
 			GUI.DrawTexture (new Rect (Input.mousePosition.x, Screen.height - Input.mousePosition.y, width - 8, height - 8), draggedItem.image);
 		}
-		if (secondDraggedItem != null) {
+		else if (secondDraggedItem != null) {
 			GUI.DrawTexture (new Rect (Input.mousePosition.x, Screen.height - Input.mousePosition.y, width - 8, height - 8), secondDraggedItem.image);
 		}
 	}
@@ -155,15 +154,6 @@ public class Inventory : MonoBehaviour {
 		for (int i = 0; i < slotWidthSize; i++) {
 			for (int j = 0; j < slotHeightSize; j++) {
 				slots [i, j].draw (position.x, position.y);
-			}
-		}
-	}
-
-	void drawItems() {
-		for (int i = 0; i < slotWidthSize; i++) {
-			for (int j = 0; j < slotHeightSize; j++) {
-				if(slots[i,j].item != null)
-					GUI.DrawTexture (new Rect (4 + position.x + slotX + slots[i,j].item.x * width, 4 + position.y + slotY + slots[i,j].item.y * height, width - 8, height - 8), slots[i,j].item.image);
 			}
 		}
 	}

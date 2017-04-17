@@ -24,6 +24,7 @@ public class Loot : MonoBehaviour {
 
 	public Item loot() {
 		looted = true;
+		gameObject.tag = "Looted";
 		return item;
 	}
 }
