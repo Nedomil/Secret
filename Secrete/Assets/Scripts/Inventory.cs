@@ -7,7 +7,6 @@ public class Inventory : MonoBehaviour {
 	public Texture2D image;
 	public Rect position;
 
-	public List<Item> items = new List<Item> ();
 	int slotWidthSize = 10;
 	int slotHeightSize = 4;
 	public Slot[,] slots;
@@ -21,11 +20,13 @@ public class Inventory : MonoBehaviour {
 	private Item secondDraggedItem;
 	private Vector2 selected;
 	private Vector2 secondSelected;
-	bool tested = false;
+
+	public bool inventoryShown;
 
 	// Use this for initialization
 	void Start () {
-		setSlots ();	
+		setSlots ();
+		inventoryShown = false;
 	}
 
 	void setSlots() {
@@ -39,20 +40,43 @@ public class Inventory : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (!tested) {
-			tested = true;
-			addItem (0, 0, Items.getArmor (0));
-			addItem (0, 1, Items.getArmor (1));
+		if (Input.GetKeyDown (KeyCode.I)) {
+			inventoryShown = !inventoryShown;
+			if (!inventoryShown)
+				ClickToMove.guiBusy = false;
 		}
+	}
+
+	/// <summary>
+	/// Stores the given Item in the first non-occupied slot of the inventory. Returns false if the
+	/// inventory is already full.
+	/// </summary>
+	/// <returns><c>true</c>, if item was looted, <c>false</c> otherwise.</returns>
+	/// <param name="item">Item to store.</param>
+	public bool lootItem(Item item) {
+		for (int i = 0; i < slotWidthSize; i++) {
+			for (int j = 0; j < slotHeightSize; j++) {
+				if (!slots [i, j].occupied) {
+					addItem (i, j, item);
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	void OnGUI()
 	{
-		drawInventory ();
-		drawSlots ();
-		drawItems ();
-		detectGUIAction ();
-		draggingItem ();
+		throwAwayItem ();
+
+		if (inventoryShown) {
+			drawInventory ();
+			drawSlots ();
+			drawItems ();
+			detectGUIAction ();
+			draggingItem ();
+		}
+
 	}
 
 	void detectGUIAction() {
@@ -63,7 +87,8 @@ public class Inventory : MonoBehaviour {
 				return;
 			}
 		}
-		ClickToMove.guiBusy = false;
+		if(draggedItem == null && secondDraggedItem == null)
+			ClickToMove.guiBusy = false;
 	}
 
 	void detectMouseAction() {
@@ -104,6 +129,18 @@ public class Inventory : MonoBehaviour {
 		}
 	}
 
+	void throwAwayItem() {
+		Rect slotArea = new Rect (position.x, position.y, position.width, position.height);
+		if (!slotArea.Contains (new Vector2 (Input.mousePosition.x, Screen.height - Input.mousePosition.y))) {
+			if (draggedItem != null && Input.GetMouseButtonUp(0)) {
+				draggedItem = null;
+			}
+			if (secondDraggedItem != null && Input.GetMouseButtonDown(0)) {
+				secondDraggedItem = null;
+			}
+		}
+	}
+
 	void draggingItem() {
 		if (draggedItem != null && Input.GetMouseButton (0)) {
 			GUI.DrawTexture (new Rect (Input.mousePosition.x, Screen.height - Input.mousePosition.y, width - 8, height - 8), draggedItem.image);
@@ -123,15 +160,16 @@ public class Inventory : MonoBehaviour {
 	}
 
 	void drawItems() {
-		for (int i = 0; i < items.Count; i++) {
-			if(items[i] != draggedItem && items[i] != secondDraggedItem)
-				GUI.DrawTexture (new Rect (4 + position.x + slotX + items[i].x * width, 4 + position.y + slotY + items[i].y * height, width - 8, height - 8), items [i].image);
+		for (int i = 0; i < slotWidthSize; i++) {
+			for (int j = 0; j < slotHeightSize; j++) {
+				if(slots[i,j].item != null)
+					GUI.DrawTexture (new Rect (4 + position.x + slotX + slots[i,j].item.x * width, 4 + position.y + slotY + slots[i,j].item.y * height, width - 8, height - 8), slots[i,j].item.image);
+			}
 		}
 	}
 
 	void addItem(int x, int y, Item item) {
 		if (!slots [x, y].occupied) {
-			items.Add (item);
 			slots [x, y].item = item;
 			slots [x, y].occupied = true;
 			item.x = x;
@@ -142,7 +180,6 @@ public class Inventory : MonoBehaviour {
 
 	void removeItem(int x, int y, Item item) {
 		if (slots [x, y].occupied) {
-			items.Remove (item);
 			slots [x, y].item = null;
 			slots [x, y].occupied = false;
 		}

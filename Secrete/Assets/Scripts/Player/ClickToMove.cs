@@ -11,6 +11,7 @@ public class ClickToMove : MonoBehaviour {
 
 	/* --- Objects --- */
 	public CharacterController charController;
+	public Inventory inventory;
 
 	/* --- Stats --- */
 	public float speed;
@@ -83,12 +84,11 @@ public class ClickToMove : MonoBehaviour {
 	}
 
 	private void lootObjectIfInRange() {
-		/*if (objectToLoot != null && inLootRange (objectToLoot)) {
-			GetComponent<Inventory> ().addItem (objectToLoot.GetComponent<Item> ());
-			objectToLoot.SetActive (false);
+		if (objectToLoot != null && inLootRange (objectToLoot)) {
+			inventory.lootItem (objectToLoot.GetComponent<Loot> ().loot());
 			objectToLoot = null;
 			position = transform.position;
-		}*/
+		}
 	}
 
 	private bool inLootRange(GameObject loot) {

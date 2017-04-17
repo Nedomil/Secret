@@ -6,10 +6,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{634104FF-CF70-9183-C655-87D8B6180F7A}</ProjectGuid>
+    <ProjectGuid>{4EEDE505-0E4C-D384-09B6-38B9B45A84C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-UnityScript</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>Assets</BaseDirectory>
@@ -46,32 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Armor.cs" />
-     <Compile Include="Assets\Scripts\Attack\AreaOnMouseAttack.cs" />
-     <Compile Include="Assets\Scripts\Attack\Attack.cs" />
-     <Compile Include="Assets\Scripts\Attack\CastAttack.cs" />
-     <Compile Include="Assets\Scripts\Attack\FireStorm.cs" />
-     <Compile Include="Assets\Scripts\Attack\Fireball.cs" />
-     <Compile Include="Assets\Scripts\Attack\FireballSlave5.cs" />
-     <Compile Include="Assets\Scripts\Attack\JumpBack.cs" />
-     <Compile Include="Assets\Scripts\Attack\NormalMeleeAttack.cs" />
-     <Compile Include="Assets\Scripts\Attack\Projectile.cs" />
-     <Compile Include="Assets\Scripts\Creature.cs" />
-     <Compile Include="Assets\Scripts\GUIListener.cs" />
-     <Compile Include="Assets\Scripts\Inventory.cs" />
-     <Compile Include="Assets\Scripts\Item.cs" />
-     <Compile Include="Assets\Scripts\Items.cs" />
-     <Compile Include="Assets\Scripts\Loot.cs" />
-     <Compile Include="Assets\Scripts\NPC\AggroMeter.cs" />
-     <Compile Include="Assets\Scripts\NPC\NPC.cs" />
-     <Compile Include="Assets\Scripts\NPC\Skeleton.cs" />
-     <Compile Include="Assets\Scripts\NPC\SkeletonMage.cs" />
-     <Compile Include="Assets\Scripts\NPC\Zombie.cs" />
-     <Compile Include="Assets\Scripts\Player\ClickToMove.cs" />
-     <Compile Include="Assets\Scripts\Player\Combat.cs" />
-     <Compile Include="Assets\Scripts\Player\Level.cs" />
-     <Compile Include="Assets\Scripts\Slot.cs" />
-     <Compile Include="Assets\Scripts\SmoothFollow.cs" />
+     <Compile Include="Assets\Scripts\NewBehaviourScript.js" />
      <None Include="Assets\SkeletonData\animations.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
