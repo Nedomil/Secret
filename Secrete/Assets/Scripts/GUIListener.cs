@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Potion : Item {
+public class GUIListener : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		name = "Potion";
-		iconPath = "Sprites/hp";
+		
 	}
 	
 	// Update is called once per frame

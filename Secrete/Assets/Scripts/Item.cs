@@ -2,19 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour {
+[System.Serializable]
+public abstract class Item {
 
 	public string Name;
-	public string iconPath;
-	public string prefabPath;
+	public Texture2D image;
+	public int x;
+	public int y;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+	public abstract void performAction ();
 }

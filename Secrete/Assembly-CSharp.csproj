@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Armor.cs" />
      <Compile Include="Assets\Scripts\Attack\AreaOnMouseAttack.cs" />
      <Compile Include="Assets\Scripts\Attack\Attack.cs" />
      <Compile Include="Assets\Scripts\Attack\CastAttack.cs" />
@@ -55,12 +56,11 @@
      <Compile Include="Assets\Scripts\Attack\JumpBack.cs" />
      <Compile Include="Assets\Scripts\Attack\NormalMeleeAttack.cs" />
      <Compile Include="Assets\Scripts\Attack\Projectile.cs" />
-     <Compile Include="Assets\Scripts\Camera\SmoothFollow.cs" />
      <Compile Include="Assets\Scripts\Creature.cs" />
+     <Compile Include="Assets\Scripts\GUIListener.cs" />
      <Compile Include="Assets\Scripts\Inventory.cs" />
-     <Compile Include="Assets\Scripts\InventorySlot.cs" />
-     <Compile Include="Assets\Scripts\InventorySystem.cs" />
      <Compile Include="Assets\Scripts\Item.cs" />
+     <Compile Include="Assets\Scripts\Items.cs" />
      <Compile Include="Assets\Scripts\NPC\AggroMeter.cs" />
      <Compile Include="Assets\Scripts\NPC\NPC.cs" />
      <Compile Include="Assets\Scripts\NPC\Skeleton.cs" />
@@ -69,7 +69,8 @@
      <Compile Include="Assets\Scripts\Player\ClickToMove.cs" />
      <Compile Include="Assets\Scripts\Player\Combat.cs" />
      <Compile Include="Assets\Scripts\Player\Level.cs" />
-     <Compile Include="Assets\Scripts\Potion.cs" />
+     <Compile Include="Assets\Scripts\Slot.cs" />
+     <Compile Include="Assets\Scripts\SmoothFollow.cs" />
      <None Include="Assets\SkeletonData\animations.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

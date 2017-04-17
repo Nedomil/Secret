@@ -19,17 +19,21 @@ public class ClickToMove : MonoBehaviour {
 	private int rotationSpeed = 10;	//Time to rotate
 	private GameObject objectToLoot;
 
+	public static bool guiBusy;
 
 	// Use this for initialization
 	void Start () {
 		position = transform.position;
+		guiBusy = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetMouseButton(0)) {
-			//Locate where the player clicked on the terrain
-			locateMousePosition();
+		if (!guiBusy) {
+			if (Input.GetMouseButton (0)) {
+				//Locate where the player clicked on the terrain
+				locateMousePosition ();
+			}
 		}
 		//Move the player to the position if not getting hit.
 		if (!GetComponent<Combat> ().chasing && !GetComponent<Animation> ().IsPlaying (getHitAnim.name) && !attackGoingOn ())
@@ -79,12 +83,12 @@ public class ClickToMove : MonoBehaviour {
 	}
 
 	private void lootObjectIfInRange() {
-		if (objectToLoot != null && inLootRange (objectToLoot)) {
+		/*if (objectToLoot != null && inLootRange (objectToLoot)) {
 			GetComponent<Inventory> ().addItem (objectToLoot.GetComponent<Item> ());
-			Destroy(objectToLoot); //<-----------------------------------------------------
+			objectToLoot.SetActive (false);
 			objectToLoot = null;
 			position = transform.position;
-		}
+		}*/
 	}
 
 	private bool inLootRange(GameObject loot) {
