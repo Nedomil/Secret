@@ -16,6 +16,7 @@ public class Items : MonoBehaviour {
 		armor.Name = Items.armor [id].Name;
 		armor.prefab = Items.armor [id].prefab;
 		armor.kind = Items.armor [id].kind;
+		armor.id = id;
 
 		return armor;
 	}

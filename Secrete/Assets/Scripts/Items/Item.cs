@@ -8,6 +8,7 @@ public abstract class Item {
 	public string Name;
 	public Texture2D image;
 	public GameObject prefab;
+	public int id;
 	public int x;
 	public int y;
 

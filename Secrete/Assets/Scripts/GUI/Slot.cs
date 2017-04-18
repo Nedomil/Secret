@@ -15,6 +15,6 @@ public class Slot {
 
 	public void draw(float frameX, float frameY) {
 		if(item != null)
-			GUI.DrawTexture (new Rect(frameX + position.x, frameY + position.y, position.width, position.height), item.image);
+			GUI.DrawTexture (new Rect(4 + frameX + position.x, 4 + frameY + position.y, position.width - 8, position.height - 8), item.image);
 	}
 }
