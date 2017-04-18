@@ -46,7 +46,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Armor.cs" />
      <Compile Include="Assets\Scripts\Attack\AreaOnMouseAttack.cs" />
      <Compile Include="Assets\Scripts\Attack\Attack.cs" />
      <Compile Include="Assets\Scripts\Attack\CastAttack.cs" />
@@ -57,11 +56,13 @@
      <Compile Include="Assets\Scripts\Attack\NormalMeleeAttack.cs" />
      <Compile Include="Assets\Scripts\Attack\Projectile.cs" />
      <Compile Include="Assets\Scripts\Creature.cs" />
-     <Compile Include="Assets\Scripts\GUIListener.cs" />
-     <Compile Include="Assets\Scripts\Inventory.cs" />
-     <Compile Include="Assets\Scripts\Item.cs" />
-     <Compile Include="Assets\Scripts\Items.cs" />
-     <Compile Include="Assets\Scripts\Loot.cs" />
+     <Compile Include="Assets\Scripts\GUI\Inventory.cs" />
+     <Compile Include="Assets\Scripts\GUI\Slot.cs" />
+     <Compile Include="Assets\Scripts\Items\Armor.cs" />
+     <Compile Include="Assets\Scripts\Items\Item.cs" />
+     <Compile Include="Assets\Scripts\Items\Items.cs" />
+     <Compile Include="Assets\Scripts\Items\Loot.cs" />
+     <Compile Include="Assets\Scripts\LootPool.cs" />
      <Compile Include="Assets\Scripts\NPC\AggroMeter.cs" />
      <Compile Include="Assets\Scripts\NPC\NPC.cs" />
      <Compile Include="Assets\Scripts\NPC\Skeleton.cs" />
@@ -70,7 +71,7 @@
      <Compile Include="Assets\Scripts\Player\ClickToMove.cs" />
      <Compile Include="Assets\Scripts\Player\Combat.cs" />
      <Compile Include="Assets\Scripts\Player\Level.cs" />
-     <Compile Include="Assets\Scripts\Slot.cs" />
+     <Compile Include="Assets\Scripts\SkeletonLootPool.cs" />
      <Compile Include="Assets\Scripts\SmoothFollow.cs" />
      <None Include="Assets\SkeletonData\animations.txt" />
  <Reference Include="UnityEngine.UI">

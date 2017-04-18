@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,12 +36,18 @@ public class NPC : Creature {
 	/* --- Bools --- */
 	public bool walking;
 
+	/* --- Loot --- */
+	public LootPool lootPool;
+
 	// Use this for initialization
 	void Start () {
 	}
 
 	// Update is called once per frame
 	void Update () {
+		if (lootPool == null)
+			lootPool = new SkeletonLootPool (); // <---------------------------------------------------------------- not good!
+
 		//Debug.Log (!specialAttack ());
 		if (!isDead) {
 			checkRadiusForOpponents ();
@@ -162,6 +168,7 @@ public class NPC : Creature {
 		GetComponent<Animation> ().CrossFade (die.name);
 		isCorpse = true;
 		gameObject.tag = "Corpse";
+		lootPool.loot (transform.position.x, transform.position.z);
 		Destroy (charController);
 	}
 
