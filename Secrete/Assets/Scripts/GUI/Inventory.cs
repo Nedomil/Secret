@@ -10,6 +10,7 @@ public class Inventory : MonoBehaviour {
 	int slotWidthSize = 10;
 	int slotHeightSize = 4;
 	public Slot[,] slots;
+	public Slot helmet;
 
 	public int slotX;
 	public int slotY;
@@ -30,6 +31,7 @@ public class Inventory : MonoBehaviour {
 	}
 
 	void setSlots() {
+		helmet = new Slot (new Rect (131, 3, 59, 59));
 		slots = new Slot[slotWidthSize, slotHeightSize];
 		for (int i = 0; i < slotWidthSize; i++) {
 			for (int j = 0; j < slotHeightSize; j++) {
@@ -40,7 +42,7 @@ public class Inventory : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown (KeyCode.I)) {
+		if (Input.GetKeyDown (KeyCode.I) && draggedItem == null && secondDraggedItem == null) {
 			inventoryShown = !inventoryShown;
 			if (!inventoryShown)
 				ClickToMove.guiBusy = false;
@@ -67,7 +69,7 @@ public class Inventory : MonoBehaviour {
 
 	void OnGUI()
 	{
-		throwAwayItem ();
+		//throwAwayItem ();
 
 		if (inventoryShown) {
 			drawInventory ();
@@ -79,22 +81,45 @@ public class Inventory : MonoBehaviour {
 	}
 
 	void detectGUIAction() {
-		if (Input.mousePosition.x > position.x && Input.mousePosition.x < position.x + position.width) {
-			if (Screen.height - Input.mousePosition.y > position.y && Screen.height - Input.mousePosition.y < position.y + position.height) {
-				detectMouseAction ();
+
+		Vector2 mousePosition = getMousePosition ();
+		Rect inventoryWindow = new Rect (position.x, position.y, position.width, position.height);
+		Rect helmetPosition = new Rect (helmet.position.x, helmet.position.y, helmet.position.width, helmet.position.height);
+		//--- What happens, if mouse on Inventory ---
+		if (inventoryWindow.Contains (mousePosition)) {
+			Rect slotArea = new Rect (position.x + slots[0,0].position.x, position.y + slots[0,0].position.y, 10 * width, 4 * height);
+			if (slotArea.Contains (mousePosition)) {
+				mouseOverInventoryAction ();
 				ClickToMove.guiBusy = true;
 				return;
+			} else if (helmetPosition.Contains(mousePosition)) {
+
+			} else {
+				if (draggedItem != null) {
+					returnDraggedItemToLastSlot ();
+				}
 			}
+		} else {
+			// --- What happens, if mouse not on Inventory ---
+			throwAwayItem ();
 		}
+
 		if(draggedItem == null && secondDraggedItem == null)
 			ClickToMove.guiBusy = false;
 	}
 
-	void detectMouseAction() {
+	private void returnDraggedItemToLastSlot() {
+		if (Event.current.isMouse && Input.GetMouseButtonUp (0)) {
+			addItem (draggedItem.x, draggedItem.y, draggedItem);
+			draggedItem = null;
+		}
+	}
+
+	private void mouseOverInventoryAction() {
 		for (int i = 0; i < slotWidthSize; i++) {
 			for (int j = 0; j < slotHeightSize; j++) {
 				Rect slot = new Rect (position.x + slots[i,j].position.x, position.y + slots[i,j].position.y, width, height);
-				if (slot.Contains (new Vector2 (Input.mousePosition.x, Screen.height - Input.mousePosition.y))) {
+				if (slot.Contains (getMousePosition())) {
 					if (Event.current.isMouse && Input.GetMouseButtonDown (0)) {
 						if (secondDraggedItem == null) {
 							selected.x = i;
@@ -128,15 +153,16 @@ public class Inventory : MonoBehaviour {
 		}
 	}
 
+	private Vector2 getMousePosition() {
+		return new Vector2 (Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+	}
+
 	void throwAwayItem() {
-		Rect slotArea = new Rect (position.x, position.y, position.width, position.height);
-		if (!slotArea.Contains (new Vector2 (Input.mousePosition.x, Screen.height - Input.mousePosition.y))) {
-			if (draggedItem != null && Input.GetMouseButtonUp(0)) {
-				draggedItem = null;
-			}
-			if (secondDraggedItem != null && Input.GetMouseButtonDown(0)) {
-				secondDraggedItem = null;
-			}
+		if (draggedItem != null && Input.GetMouseButtonUp(0)) {
+			draggedItem = null;
+		}
+		if (secondDraggedItem != null && Input.GetMouseButtonDown(0)) {
+			secondDraggedItem = null;
 		}
 	}
 
@@ -156,6 +182,7 @@ public class Inventory : MonoBehaviour {
 				slots [i, j].draw (position.x, position.y);
 			}
 		}
+		helmet.draw (position.x, position.y);
 	}
 
 	void addItem(int x, int y, Item item) {
